@@ -1,0 +1,14 @@
+fbreader (0.12.9dfsg-1) experimental; urgency=low
+
+  The information on all books is moved from XML files to the SQLite database.
+  This migration work is executed once on the first launch of the new version
+  of FBReader.
+  The migration includes some correction of tags, for which FBReader needs
+  an access to the books. Thus, before the first launch of the new FBReader
+  version it is strongly recommended to attach all removable mass storages
+  on which books are stored.
+
+  Qt3 interface for fbreader (the package libzlui-qt) is not built anymore.
+  Use Qt4 interface (the package libzlui-qt4) instead.
+
+ -- Eugene V. Lyubimkin <jackyf@debian.org>  Sun, 13 Dec 2009 11:08:27 +0200

@@ -1,0 +1,14 @@
+0001-110-use-sensible-browser.patch
+0002-400-fix-building-with-gcc46.patch
+0003-600-fix-ftell-crash.patch
+0004-900-delete-useless-strip-flag.patch
+0005-910-zlui-qt4-links-to-QtCore.patch
+0006-930-use-shell-make-variable.patch
+0007-950-link-to-libunibreak.patch
+0008-951-fix-calling-compiler.patch
+0009-fbreader-Makefile-do-not-try-to-install-empty-format.patch
+0010-booksdb-avoid-converting-boolean-to-shared_ptr.patch
+0011-zlibrary-unix-curl-avoid-duplicate-case-in-a-switch.patch
+0012-makefiles-use-externally-passed-PKG_CONFIG-if-availa.patch
+0013-fbreader-Makefile-make-linking-order-reproducible.patch
+0014-fix-ftbfs-gcc11.patch

@@ -1,0 +1,32 @@
+From: "Eugene V. Lyubimkin" <jackyf@debian.org>
+Date: Sun, 9 Dec 2018 16:31:45 +0100
+Subject: zlibrary: unix: curl: avoid duplicate case in a switch
+
+CURLE_SSL_CACERT was merged into CURLE_PEER_FAILED_VERIFICATION, see [1]
+
+[1] https://github.com/curl/curl/commit/3f3b26d6feb0667714902e836af608094235fca2
+---
+ zlibrary/core/src/unix/curl/ZLCurlNetworkManager.cpp | 7 -------
+ 1 file changed, 7 deletions(-)
+
+diff --git a/zlibrary/core/src/unix/curl/ZLCurlNetworkManager.cpp b/zlibrary/core/src/unix/curl/ZLCurlNetworkManager.cpp
+index a75d8bc..55865b6 100644
+--- a/zlibrary/core/src/unix/curl/ZLCurlNetworkManager.cpp
++++ b/zlibrary/core/src/unix/curl/ZLCurlNetworkManager.cpp
+@@ -277,16 +277,9 @@ std::string ZLCurlNetworkManager::perform(const ZLExecutionData::Vector &dataLis
+ 				case CURLE_SSL_CONNECT_ERROR:
+ 					errors.insert(ZLStringUtil::printf(errorResource["sslConnectErrorMessage"].value(), curl_easy_strerror(CURLE_SSL_CONNECT_ERROR)));
+ 					break;
+-#if LIBCURL_VERSION_NUM > 0x071100
+ 				case CURLE_PEER_FAILED_VERIFICATION:
+-#else
+-				case CURLE_SSL_PEER_CERTIFICATE:
+-#endif
+ 					errors.insert(ZLStringUtil::printf(errorResource["peerFailedVerificationMessage"].value(), ZLNetworkUtil::hostFromUrl(url)));
+ 					break;
+-				case CURLE_SSL_CACERT:
+-					errors.insert(ZLStringUtil::printf(errorResource["sslCertificateAuthorityMessage"].value(), ZLNetworkUtil::hostFromUrl(url)));
+-					break;
+ 				case CURLE_SSL_CACERT_BADFILE:
+ 					errors.insert(ZLStringUtil::printf(errorResource["sslBadCertificateFileMessage"].value(), request.sslCertificate().Path));
+ 					break;

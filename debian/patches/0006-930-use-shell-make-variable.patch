@@ -1,0 +1,117 @@
+From: "Eugene V. Lyubimkin" <jackyf@debian.org>
+Date: Sat, 20 Feb 2016 18:20:25 +0100
+Subject: 930-use-shell-make-variable
+
+Use shell MAKE variable to allow parallel builds.
+---
+ Makefile               | 6 +++---
+ fbreader/Makefile      | 4 ++--
+ zlibrary/core/Makefile | 2 +-
+ zlibrary/text/Makefile | 2 +-
+ zlibrary/ui/Makefile   | 6 +++---
+ 5 files changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 1c99c2e..df3706f 100644
+--- a/Makefile
++++ b/Makefile
+@@ -21,21 +21,21 @@ install: all do_install
+ do_install:
+ 	@for dir in $(ZLIBDIRS) $(APPDIRS); do \
+ 		if [ -d $$dir ]; then \
+-			cd $$dir; make $@; cd $(ROOTDIR); \
++			cd $$dir; $(MAKE) $@; cd $(ROOTDIR); \
+ 		fi; \
+ 	done
+ 
+ do_install_dev:
+ 	@for dir in $(ZLIBDIRS); do \
+ 		if [ -d $$dir ]; then \
+-			cd $$dir; make $@; cd $(ROOTDIR); \
++			cd $$dir; $(MAKE) $@; cd $(ROOTDIR); \
+ 		fi; \
+ 	done
+ 
+ clean:
+ 	@for dir in $(ZLIBDIRS) $(APPDIRS); do \
+ 		if [ -d $$dir ]; then \
+-			cd $$dir; make $@; cd $(ROOTDIR); \
++			cd $$dir; $(MAKE) $@; cd $(ROOTDIR); \
+ 		fi; \
+ 	done
+ 
+diff --git a/fbreader/Makefile b/fbreader/Makefile
+index 0a3e6ea..6efc10b 100644
+--- a/fbreader/Makefile
++++ b/fbreader/Makefile
+@@ -61,13 +61,13 @@ do_install:
+ 	@install -m 0644 $(wildcard data/icons/toolbar/$(VARIANT)/*.*) $(DESTDIR)$(APPIMAGEDIR_REAL)
+ 	@install -m 0644 $(wildcard data/icons/filetree/$(VARIANT)/*.*) $(DESTDIR)$(APPIMAGEDIR_REAL)
+ 	@install -m 0644 $(wildcard data/icons/booktree/new/*.*) $(DESTDIR)$(APPIMAGEDIR_REAL)
+-	@make -C $(TARGET_ARCH) RESOLUTION=$(RESOLUTION) install
++	@$(MAKE) -C $(TARGET_ARCH) RESOLUTION=$(RESOLUTION) install
+ 
+ clean:
+ 	@for subdir in $(ALL_SUBDIRS); do \
+ 		$(MAKE) -C $$subdir -f $(MAKEFILESDIR)/subdir.mk clean; \
+ 	done;
+ 	@for subdir in $(ALL_ARCHSUBDIRS); do \
+-		cd $$subdir; make clean; cd ..; \
++		cd $$subdir; $(MAKE) clean; cd ..; \
+ 	done;
+ 	@$(RM) $(TARGET) err
+diff --git a/zlibrary/core/Makefile b/zlibrary/core/Makefile
+index 7cb359b..a0e7735 100644
+--- a/zlibrary/core/Makefile
++++ b/zlibrary/core/Makefile
+@@ -38,7 +38,7 @@ else
+ endif
+ 
+ .objects:
+-	@for subdir in $(SUBDIRS); do \
++	+@for subdir in $(SUBDIRS); do \
+ 		if [ -d $$subdir ]; then \
+ 			if ! $(LIBMAKE) -C $$subdir -f $(MAKEFILESDIR)/subdir.mk; then \
+ 				exit 1; \
+diff --git a/zlibrary/text/Makefile b/zlibrary/text/Makefile
+index 021e71e..551308e 100644
+--- a/zlibrary/text/Makefile
++++ b/zlibrary/text/Makefile
+@@ -22,7 +22,7 @@ endif
+ SUBDIRS = src/model src/area src/view src/style src/styleOptions src/hyphenation
+ 
+ .objects:
+-	@for subdir in $(SUBDIRS); do \
++	+@for subdir in $(SUBDIRS); do \
+ 		if [ -d $$subdir ]; then \
+ 			if ! $(LIBMAKE) -C $$subdir -f $(MAKEFILESDIR)/subdir.mk; then \
+ 				exit 1; \
+diff --git a/zlibrary/ui/Makefile b/zlibrary/ui/Makefile
+index 83cb042..59fdcf0 100644
+--- a/zlibrary/ui/Makefile
++++ b/zlibrary/ui/Makefile
+@@ -84,21 +84,21 @@ ifeq "$(UI_TYPE)" "win32"
+ endif
+ 
+ .objects:
+-	@for subdir in $(SUBDIRS); do \
++	+@for subdir in $(SUBDIRS); do \
+ 		if [ -d $$subdir ]; then \
+ 			if ! $(LIBMAKE) -C $$subdir -f $(MAKEFILESDIR)/subdir.mk; then \
+ 				exit 1; \
+ 			fi; \
+ 		fi; \
+ 	done;
+-	@for subdir in $(QTSUBDIRS); do \
++	+@for subdir in $(QTSUBDIRS); do \
+ 		if [ -d $$subdir ]; then \
+ 			if ! $(LIBMAKE) -C $$subdir -f $(MAKEFILESDIR)/qsubdir.mk; then \
+ 				exit 1; \
+ 			fi; \
+ 		fi; \
+ 	done;
+-	@for subdir in $(GTKSUBDIRS); do \
++	+@for subdir in $(GTKSUBDIRS); do \
+ 		if [ -d $$subdir ]; then \
+ 			if ! $(LIBMAKE) -C $$subdir -f $(MAKEFILESDIR)/gtksubdir.mk; then \
+ 				exit 1; \

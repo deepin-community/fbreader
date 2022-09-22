@@ -1,0 +1,22 @@
+From: "Eugene V. Lyubimkin" <jackyf@debian.org>
+Date: Sun, 24 Jul 2016 11:03:52 +0200
+Subject: booksdb: avoid converting boolean to shared_ptr
+
+GCC6 doesn't like it.
+---
+ fbreader/src/database/booksdb/BooksDB.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/fbreader/src/database/booksdb/BooksDB.cpp b/fbreader/src/database/booksdb/BooksDB.cpp
+index 3a37640..2bbb37c 100644
+--- a/fbreader/src/database/booksdb/BooksDB.cpp
++++ b/fbreader/src/database/booksdb/BooksDB.cpp
+@@ -145,7 +145,7 @@ shared_ptr<Book> BooksDB::loadBook(const std::string &fileName) {
+ 
+ 	myFindFileId->setFileName(fileName);
+ 	if (!myFindFileId->run()) {
+-		return false;
++		return 0;
+ 	}
+ 	((DBIntValue&)*myLoadBook->parameter("@file_id").value()) = myFindFileId->fileId();
+ 	shared_ptr<DBDataReader> reader = myLoadBook->executeReader();

@@ -1,0 +1,29 @@
+From: "Eugene V. Lyubimkin" <jackyf@debian.org>
+Date: Sat, 20 Feb 2016 18:20:25 +0100
+Subject: 600-fix-ftell-crash
+
+If myBaseStream->open() failed (i.e. result == false), calling
+myBaseStream->offset() may attempt to call ftell() on an invalid file
+descriptor which may lead to a crash.
+
+See also https://github.com/geometer/FBReader/issues/224.
+---
+ zlibrary/core/src/filesystem/ZLInputStreamDecorator.cpp | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/zlibrary/core/src/filesystem/ZLInputStreamDecorator.cpp b/zlibrary/core/src/filesystem/ZLInputStreamDecorator.cpp
+index b44cf9a..b0b65b9 100644
+--- a/zlibrary/core/src/filesystem/ZLInputStreamDecorator.cpp
++++ b/zlibrary/core/src/filesystem/ZLInputStreamDecorator.cpp
+@@ -24,7 +24,10 @@ ZLInputStreamDecorator::ZLInputStreamDecorator(shared_ptr<ZLInputStream> decorat
+ 
+ bool ZLInputStreamDecorator::open() {
+ 	bool result = myBaseStream->open();
+-	myBaseOffset = myBaseStream->offset();
++	if (result)
++	{
++		myBaseOffset = myBaseStream->offset();
++	}
+ 	return result;
+ }
+ 

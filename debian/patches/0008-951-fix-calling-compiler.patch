@@ -1,0 +1,101 @@
+From: "Eugene V. Lyubimkin" <jackyf@debian.org>
+Date: Sat, 20 Feb 2016 18:20:25 +0100
+Subject: 951-fix-calling-compiler
+
+===================================================================
+---
+ makefiles/arch/desktop.mk | 3 +--
+ makefiles/gtksubdir.mk    | 8 ++------
+ makefiles/platforms.mk    | 4 +---
+ makefiles/qsubdir.mk      | 8 ++------
+ makefiles/subdir.mk       | 9 +--------
+ 5 files changed, 7 insertions(+), 25 deletions(-)
+
+diff --git a/makefiles/arch/desktop.mk b/makefiles/arch/desktop.mk
+index 357f2ce..78211a8 100644
+--- a/makefiles/arch/desktop.mk
++++ b/makefiles/arch/desktop.mk
+@@ -10,8 +10,7 @@ CC = gcc
+ AR = ar rsu
+ LD = g++
+ 
+-CFLAGS = -pipe -fno-exceptions -Wall -Wno-ctor-dtor-privacy -W -DLIBICONV_PLUG
+-LDFLAGS =
++CFLAGS += -pipe -fno-exceptions -Wall -Wno-ctor-dtor-privacy -W -DLIBICONV_PLUG
+ 
+ ifeq "$(UI_TYPE)" "qt"
+   MOC = moc-qt3
+diff --git a/makefiles/gtksubdir.mk b/makefiles/gtksubdir.mk
+index aed94f3..23f51da 100644
+--- a/makefiles/gtksubdir.mk
++++ b/makefiles/gtksubdir.mk
+@@ -11,14 +11,10 @@ OBJECTS += $(patsubst %.cpp, %.o, $(SOURCES))
+ .SUFFIXES: .c .cpp .o .h
+ 
+ .c.o:
+-	@echo -n 'Compiling $@ ...'
+-	@$(CC) -MMD -c $(CFLAGS) $(INCLUDE) $<
+-	@echo ' OK'
++	$(CC) -MMD -c $(CPPFLAGS) $(CFLAGS) $(INCLUDE) $<
+ 
+ .cpp.o:
+-	@echo -n 'Compiling $@ ...'
+-	@$(CC) -MMD -c $(CFLAGS) $(INCLUDE) $<
+-	@echo ' OK'
++	$(CC) -MMD -c $(CPPFLAGS) $(CFLAGS) $(CXXFLAGS) $(INCLUDE) $<
+ 
+ all: $(OBJECTS)
+ 
+diff --git a/makefiles/platforms.mk b/makefiles/platforms.mk
+index df83885..129463b 100644
+--- a/makefiles/platforms.mk
++++ b/makefiles/platforms.mk
+@@ -10,6 +10,4 @@ ifeq "$(UI_TYPE)" ""
+ $(error UI_TYPE is not defined. Please edit $(ROOTDIR)/makefiles/target.mk)
+ endif
+ 
+-ifeq "$(TARGET_STATUS)" ""
+-	TARGET_STATUS = release
+-endif
++TARGET_STATUS = "" # Debian packaging always set flags itself
+diff --git a/makefiles/qsubdir.mk b/makefiles/qsubdir.mk
+index 14b4efc..f6ec87b 100644
+--- a/makefiles/qsubdir.mk
++++ b/makefiles/qsubdir.mk
+@@ -11,14 +11,10 @@ OBJECTS = $(patsubst %.cpp, %.o, $(SOURCES))
+ .SUFFIXES: .cpp .moc.cpp .moc.o .o .h
+ 
+ .cpp.o:
+-	@echo -n 'Compiling $@ ...'
+-	@$(CC) -MMD -c $(CFLAGS) $(INCLUDE) $<
+-	@echo ' OK'
++	$(CC) -MMD -c $(CPPFLAGS) $(CFLAGS) $(CXXFLAGS) $(INCLUDE) $<
+ 
+ .h.moc.cpp:
+-	@echo -n 'Generating $@ ...'
+-	@$(MOC) $< -o $@
+-	@echo ' OK'
++	$(MOC) $< -o $@
+ 
+ all: $(OBJECTS) $(OBJMOC)
+ 
+diff --git a/makefiles/subdir.mk b/makefiles/subdir.mk
+index b364211..63e66bf 100644
+--- a/makefiles/subdir.mk
++++ b/makefiles/subdir.mk
+@@ -11,14 +11,7 @@ OBJECTS = $(patsubst %.cpp, %.o, $(SOURCES_CPP)) $(patsubst %.M, %.o, $(SOURCES_
+ .SUFFIXES: .cpp .M .m .o .h
+ 
+ .cpp.o:
+-	@echo -n 'Compiling $@ ...'
+-ifdef CFLAGS_NOARCH
+-	@$(CC) -MM $(CFLAGS_PRE) $(INCLUDE) $< -o `basename $< .cpp`.d
+-	@$(CC) -c $(CFLAGS) $(INCLUDE) $<
+-else
+-	@$(CC) -MMD -c $(CFLAGS) $(INCLUDE) $<
+-endif
+-	@echo ' OK'
++	$(CC) -MMD -c $(CPPFLAGS) $(CFLAGS) $(CXXFLAGS) $(INCLUDE) $<
+ 
+ .M.o:
+ 	@echo -n 'Compiling $@ ...'

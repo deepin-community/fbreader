@@ -1,0 +1,22 @@
+From: "Eugene V. Lyubimkin" <jackyf@debian.org>
+Date: Sat, 20 Feb 2016 18:23:10 +0100
+Subject: fbreader: Makefile: do not try to install empty formats/xhtml
+ directory
+
+---
+ fbreader/Makefile | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/fbreader/Makefile b/fbreader/Makefile
+index 6efc10b..ba247b7 100644
+--- a/fbreader/Makefile
++++ b/fbreader/Makefile
+@@ -44,8 +44,6 @@ do_install:
+ 	@install -m 0644 $(wildcard data/network/certificates/*.crt) $(FBSHAREDIR)/network/certificates
+ 	@install -d $(FBSHAREDIR)/formats/html
+ 	@install -m 0644 data/formats/html/html.ent $(FBSHAREDIR)/formats/html
+-	@install -d $(FBSHAREDIR)/formats/xhtml
+-	@install -m 0644 $(wildcard data/formats/xhtml/*.ent) $(FBSHAREDIR)/formats/xhtml
+ 	@install -d $(FBSHAREDIR)/formats/fb2
+ 	@sed "s/VERSION/$(VERSION)/" data/formats/fb2/FBReaderVersion.ent > $(FBSHAREDIR)/formats/fb2/FBReaderVersion.ent
+ 	@install -m 0644 data/formats/fb2/fb2genres.xml $(FBSHAREDIR)/formats/fb2

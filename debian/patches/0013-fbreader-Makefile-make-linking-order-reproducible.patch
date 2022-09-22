@@ -1,0 +1,21 @@
+From: Ievgen Liubymkin <jackyf@debian.org>
+Date: Sun, 1 Sep 2019 09:56:54 +0200
+Subject: fbreader: Makefile: make linking order reproducible
+
+---
+ fbreader/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/fbreader/Makefile b/fbreader/Makefile
+index ba247b7..90070bd 100644
+--- a/fbreader/Makefile
++++ b/fbreader/Makefile
+@@ -21,7 +21,7 @@ all: .resources
+ 		fi; \
+ 	done;
+ 	@echo -n 'Linking $(TARGET) ...'
+-	@$(LD) $(LDFLAGS) -o $(TARGET) `find src -name *.o` -L$(ROOTDIR)/zlibrary/text $(TEXT_LIBS) $(CORE_LIBS) -lsqlite3
++	@$(LD) $(LDFLAGS) -o $(TARGET) `find src -name *.o | LC_ALL=C sort` -L$(ROOTDIR)/zlibrary/text $(TEXT_LIBS) $(CORE_LIBS) -lsqlite3
+ 	@echo ' OK'
+ 
+ FBSHAREDIR = $(DESTDIR)$(SHAREDIR)/FBReader

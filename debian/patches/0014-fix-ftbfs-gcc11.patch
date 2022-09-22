@@ -1,0 +1,127 @@
+Description: Fix FTBFS for gcc 11
+ Comparator operator() have to be const in gcc 11.
+Bug-Debian: http://bugs.debian.org/984121
+Author: Ying-Chun Liu (PaulLiu) <paulliu@debian.org>
+Index: fbreader-0.12.10dfsg2/fbreader/src/library/Comparators.cpp
+===================================================================
+--- fbreader-0.12.10dfsg2.orig/fbreader/src/library/Comparators.cpp
++++ fbreader-0.12.10dfsg2/fbreader/src/library/Comparators.cpp
+@@ -25,7 +25,7 @@
+ bool BookComparator::operator() (
+ 	const shared_ptr<Book> book0,
+ 	const shared_ptr<Book> book1
+-) {
++) const {
+ 	const std::string &seriesTitle0 = book0->seriesTitle();
+ 	const std::string &seriesTitle1 = book1->seriesTitle();
+ 	int comp = seriesTitle0.compare(seriesTitle1);
+@@ -50,14 +50,14 @@ bool BookComparator::operator() (
+ bool BookByFileNameComparator::operator() (
+ 	const shared_ptr<Book> book0,
+ 	const shared_ptr<Book> book1
+-) {
++) const {
+ 	return book0->filePath() < book1->filePath();
+ }
+ 
+ bool AuthorComparator::operator() (
+ 	const shared_ptr<Author> author0,
+ 	const shared_ptr<Author> author1
+-) {
++) const {
+ 	if (author0.isNull()) {
+ 		return !author1.isNull();
+ 	}
+@@ -72,7 +72,7 @@ bool AuthorComparator::operator() (
+ bool TagComparator::operator() (
+ 	shared_ptr<Tag> tag0,
+ 	shared_ptr<Tag> tag1
+-) {
++) const {
+ 	if (tag0.isNull()) {
+ 		return !tag1.isNull();
+ 	}
+Index: fbreader-0.12.10dfsg2/fbreader/src/library/Comparators.h
+===================================================================
+--- fbreader-0.12.10dfsg2.orig/fbreader/src/library/Comparators.h
++++ fbreader-0.12.10dfsg2/fbreader/src/library/Comparators.h
+@@ -32,7 +32,7 @@ public:
+ 	bool operator () (
+ 		const shared_ptr<Book> book0,
+ 		const shared_ptr<Book> book1
+-	);
++	) const;
+ };
+ 
+ class BookByFileNameComparator {
+@@ -41,7 +41,7 @@ public:
+ 	bool operator () (
+ 		const shared_ptr<Book> book0,
+ 		const shared_ptr<Book> book1
+-	);
++	) const;
+ };
+ 
+ class AuthorComparator {
+@@ -50,7 +50,7 @@ public:
+ 	bool operator () (
+ 		const shared_ptr<Author> author0,
+ 		const shared_ptr<Author> author1
+-	);
++	) const;
+ };
+ 
+ class TagComparator {
+@@ -59,7 +59,7 @@ public:
+ 	bool operator () (
+ 		shared_ptr<Tag> tag0,
+ 		shared_ptr<Tag> tag1
+-	);
++	) const;
+ };
+ 
+ #endif /* __COMPARATORS_H__ */
+Index: fbreader-0.12.10dfsg2/fbreader/src/network/NetworkComparators.cpp
+===================================================================
+--- fbreader-0.12.10dfsg2.orig/fbreader/src/network/NetworkComparators.cpp
++++ fbreader-0.12.10dfsg2/fbreader/src/network/NetworkComparators.cpp
+@@ -19,7 +19,7 @@
+ 
+ #include "NetworkComparators.h"
+ 
+-bool NetworkBookItemComparator::operator () (const shared_ptr<NetworkItem> &bookPtr0, const shared_ptr<NetworkItem> &bookPtr1) {
++bool NetworkBookItemComparator::operator () (const shared_ptr<NetworkItem> &bookPtr0, const shared_ptr<NetworkItem> &bookPtr1) const {
+ 	const bool book0isABook =
+ 		bookPtr0->isInstanceOf(NetworkBookItem::TYPE_ID);
+ 	const bool book1isABook =
+@@ -81,7 +81,7 @@ bool NetworkBookItemComparator::operator
+ NetworkAuthorComparator::NetworkAuthorComparator(const std::map<NetworkBookItem::AuthorData, unsigned int> &rates) : myRates(rates) {
+ }
+ 
+-bool NetworkAuthorComparator::operator () (const NetworkBookItem::AuthorData &author0, const NetworkBookItem::AuthorData &author1) {
++bool NetworkAuthorComparator::operator () (const NetworkBookItem::AuthorData &author0, const NetworkBookItem::AuthorData &author1) const {
+ 	std::map<NetworkBookItem::AuthorData, unsigned int>::const_iterator it1 = myRates.find(author0);
+ 	std::map<NetworkBookItem::AuthorData, unsigned int>::const_iterator it2 = myRates.find(author1);
+ 	if (it1 == myRates.end() && it2 == myRates.end()) {
+Index: fbreader-0.12.10dfsg2/fbreader/src/network/NetworkComparators.h
+===================================================================
+--- fbreader-0.12.10dfsg2.orig/fbreader/src/network/NetworkComparators.h
++++ fbreader-0.12.10dfsg2/fbreader/src/network/NetworkComparators.h
+@@ -29,7 +29,7 @@
+ class NetworkBookItemComparator {
+ 
+ public:
+-	bool operator () (const shared_ptr<NetworkItem> &bookPtr0, const shared_ptr<NetworkItem> &bookPtr1);
++	bool operator () (const shared_ptr<NetworkItem> &bookPtr0, const shared_ptr<NetworkItem> &bookPtr1) const;
+ };
+ 
+ 
+@@ -38,7 +38,7 @@ class NetworkAuthorComparator {
+ public:
+ 	NetworkAuthorComparator(const std::map<NetworkBookItem::AuthorData, unsigned int> &rates);
+ 
+-	bool operator () (const NetworkBookItem::AuthorData &author0, const NetworkBookItem::AuthorData &author1);
++	bool operator () (const NetworkBookItem::AuthorData &author0, const NetworkBookItem::AuthorData &author1) const;
+ 
+ private:
+ 	const std::map<NetworkBookItem::AuthorData, unsigned int> &myRates;

@@ -1,0 +1,39 @@
+From: "Eugene V. Lyubimkin" <jackyf@debian.org>
+Date: Sun, 9 Dec 2018 16:37:16 +0100
+Subject: makefiles: use externally-passed PKG_CONFIG if available
+
+Patch by Helmut Grohne.
+---
+ makefiles/arch/desktop.mk | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/makefiles/arch/desktop.mk b/makefiles/arch/desktop.mk
+index 78211a8..fe3238a 100644
+--- a/makefiles/arch/desktop.mk
++++ b/makefiles/arch/desktop.mk
+@@ -9,6 +9,7 @@ APPIMAGEDIR = $(INSTALLDIR)/share/pixmaps/%APPLICATION_NAME%
+ CC = gcc
+ AR = ar rsu
+ LD = g++
++PKG_CONFIG ?= pkg-config
+ 
+ CFLAGS += -pipe -fno-exceptions -Wall -Wno-ctor-dtor-privacy -W -DLIBICONV_PLUG
+ 
+@@ -20,7 +21,7 @@ else
+   QTINCLUDE = -I /usr/include/qt4
+ endif
+ 
+-GTKINCLUDE = $(shell pkg-config --cflags gtk+-2.0 libpng xft)
++GTKINCLUDE = $(shell $(PKG_CONFIG) --cflags gtk+-2.0 libpng xft)
+ 
+ ifeq "$(UI_TYPE)" "qt"
+   UILIBS = -lqt-mt
+@@ -31,7 +32,7 @@ ifeq "$(UI_TYPE)" "qt4"
+ endif
+ 
+ ifeq "$(UI_TYPE)" "gtk"
+-  UILIBS = $(shell pkg-config --libs gtk+-2.0) -lpng -ljpeg
++  UILIBS = $(shell $(PKG_CONFIG) --libs gtk+-2.0) -lpng -ljpeg
+ endif
+ 
+ RM = rm -rvf

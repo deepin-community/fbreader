@@ -1,0 +1,22 @@
+From: "Eugene V. Lyubimkin" <jackyf@debian.org>
+Date: Sat, 20 Feb 2016 18:20:25 +0100
+Subject: 900-delete-useless-strip-flag
+
+Don't strip fbreader binary directly after building, dh_strip will do it.
+---
+ makefiles/config.mk | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/makefiles/config.mk b/makefiles/config.mk
+index 84ad7d6..b4048ae 100644
+--- a/makefiles/config.mk
++++ b/makefiles/config.mk
+@@ -28,7 +28,7 @@ endif
+ 
+ ifeq "$(TARGET_STATUS)" "release"
+ 	CFLAGS += -O3
+-	LDFLAGS += -s
++#	LDFLAGS += -s # dh_strip will strip it in Debian --JEH
+ endif
+ ifeq "$(TARGET_STATUS)" "debug"
+ 	CFLAGS += -O0 -g

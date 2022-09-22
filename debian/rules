@@ -1,0 +1,47 @@
+#!/usr/bin/make -f
+
+ifneq (,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
+	NUMJOBS = $(patsubst parallel=%,%,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
+	AUXMAKEFLAGS += -j$(NUMJOBS)
+endif
+
+DPKG_EXPORT_BUILDFLAGS=1
+include /usr/share/dpkg/architecture.mk
+include /usr/share/dpkg/buildflags.mk
+
+DEB_DIR = $(CURDIR)/debian
+
+export PKG_CONFIG=$(DEB_HOST_GNU_TYPE)-pkg-config
+AUXMAKEFLAGS += 'LD=$$(CXX)'
+
+%:
+	dh $@ --with quilt
+
+override_dh_auto_build:
+	dh_auto_build -- $(AUXMAKEFLAGS) -C zlibrary/core TARGET_ARCH=desktop UI_TYPE=dummy
+	dh_auto_build -- $(AUXMAKEFLAGS) -C zlibrary/text TARGET_ARCH=desktop UI_TYPE=dummy
+	dh_auto_build -- $(AUXMAKEFLAGS) -C zlibrary/ui TARGET_ARCH=desktop UI_TYPE=gtk
+	dh_auto_build -- $(AUXMAKEFLAGS) -C fbreader TARGET_ARCH=desktop UI_TYPE=dummy
+
+install-common:
+	$(MAKE) -C zlibrary/core TARGET_ARCH=desktop UI_TYPE=dummy DESTDIR=$(DEB_DIR)/tmp/zlcore do_install
+	$(MAKE) -C zlibrary/text TARGET_ARCH=desktop UI_TYPE=dummy DESTDIR=$(DEB_DIR)/tmp/zltext do_install
+
+override_dh_auto_install-indep: install-common
+	mv $(DEB_DIR)/tmp/zlcore/usr/share/zlibrary $(DEB_DIR)/libzlcore-data/usr/share
+	mv $(DEB_DIR)/tmp/zltext/usr/share/zlibrary $(DEB_DIR)/libzltext-data/usr/share
+
+override_dh_auto_install-arch: install-common
+	mv $(DEB_DIR)/tmp/zlcore/usr/lib $(DEB_DIR)/libzlcore0.13/usr
+	mv $(DEB_DIR)/tmp/zltext/usr/lib $(DEB_DIR)/libzltext0.13/usr
+	$(MAKE) -C zlibrary/core TARGET_ARCH=desktop UI_TYPE=dummy DESTDIR=$(DEB_DIR)/libzlcore-dev do_install_dev
+	$(MAKE) -C zlibrary/text TARGET_ARCH=desktop UI_TYPE=dummy DESTDIR=$(DEB_DIR)/libzltext-dev do_install_dev
+	$(MAKE) -C zlibrary/ui TARGET_ARCH=desktop UI_TYPE=gtk DESTDIR=$(DEB_DIR)/libzlui-gtk do_install
+	$(MAKE) -C fbreader TARGET_ARCH=desktop UI_TYPE=dummy DESTDIR=$(DEB_DIR)/fbreader do_install
+
+override_dh_makeshlibs:
+	dh_makeshlibs -plibzlcore0.13
+	dh_makeshlibs -plibzltext0.13
+
+include /usr/share/quilt/quilt.make
+
