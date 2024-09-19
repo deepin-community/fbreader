@@ -1,8 +1,12 @@
-fbreader (0.12.10dfsg2-6) UNRELEASED; urgency=medium
+fbreader (0.12.10dfsg2-6deepin0) unstable; urgency=medium
 
+  [ Debian QA Group ]
   * update
 
- -- Debian QA Group <packages@qa.debian.org>  Thu, 26 May 2022 13:35:10 +0800
+  [ Tianyu Chen ]
+  * No source change upload against GCC 12.
+
+ -- Tianyu Chen <sweetyfish@deepin.org>  Thu, 19 Sep 2024 22:45:56 +0800
 
 fbreader (0.12.10dfsg2-6) unstable; urgency=low
 
